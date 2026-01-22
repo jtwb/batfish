@@ -509,7 +509,7 @@ import org.batfish.representation.juniper.VlanReference;
 import org.batfish.representation.juniper.VrrpGroup;
 import org.batfish.representation.juniper.Zone;
 import org.hamcrest.Matchers;
-import org.junit.Ignore;
+// import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -8982,7 +8982,7 @@ public final class FlatJuniperGrammarTest {
     parseJuniperConfig("switch-options-vrf-target-auto");
   }
 
-  @Ignore("Bug: parser error in M_VrfTarget lexer mode causes parse error on next line.")
+  //   @Ignore("Bug: parser error in M_VrfTarget lexer mode causes parse error on next line.")
   @Test
   public void testVrfTargetErrorRecovery() throws IOException {
     // Scenario: switch-options-unkown contains a syntax error
@@ -9009,10 +9009,13 @@ public final class FlatJuniperGrammarTest {
     ParserRuleContext tree =
         Batfish.parse(
             flatJuniperParser, new BatfishLogger(BatfishLogger.LEVELSTR_FATAL, false), settings);
+    System.out.println("Tree: " + tree.getText());
     extractor.processParseTree(DUMMY_SNAPSHOT_1, tree);
+    System.out.println("Tree (extracted): " + tree.getText());
     JuniperConfiguration jc =
         SerializationUtils.clone((JuniperConfiguration) extractor.getVendorConfiguration());
     jc.setWarnings(w);
+    System.out.println("cfg: " + jc);
 
     // Observation: after recovering from an unrecognized token in "switch-options vrf-target",
     // the following line is incorrectly parsed.

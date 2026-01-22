@@ -12,7 +12,7 @@ public abstract class BatfishLexer extends Lexer {
 
   public static final int UNRECOGNIZED_LINE_TOKEN = Integer.MAX_VALUE - 1;
 
-  private BatfishCombinedParser<?, ?> _parser;
+  BatfishCombinedParser<?, ?> _parser;
 
   private @Nullable BatfishLexerRecoveryStrategy _recoveryStrategy;
 
@@ -79,6 +79,22 @@ public abstract class BatfishLexer extends Lexer {
    */
   public String printStateVariables() {
     return "";
+  }
+
+  /** Print the stack of Lexer modes (e.g. [DEFAULT_MODE, BRACE_MODE]) */
+  public String getModeStackString() {
+    if (_modeStack.isEmpty()) {
+      return "[]";
+    }
+    StringBuilder sb = new StringBuilder();
+    sb.append("[");
+    for (int i = 0; i < _modeStack.size(); i++) {
+      int mode = _modeStack.get(i);
+      sb.append(getModeNames()[mode]).append(", ");
+    }
+    sb.setLength(sb.length() - 2); // remove trailing comma
+    sb.append("]");
+    return sb.toString();
   }
 
   @Override

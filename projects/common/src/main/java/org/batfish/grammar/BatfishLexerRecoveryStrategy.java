@@ -60,6 +60,12 @@ public class BatfishLexerRecoveryStrategy {
   public void recover() {
     // Always recover in the default mode -- otherwise, the parser can get stuck in an infinite
     // loop, e.g. if separator is not valid in the current mode.
+    int currentMode = _lexer._mode;
+    String modeName = _lexer.getModeNames()[currentMode];
+    System.out.println("Current Mode: " + modeName);
+    Thread.dumpStack();
+
+    System.out.println("Mode Stack: " + _lexer.getModeStackString());
     _lexer._mode = Lexer.DEFAULT_MODE;
 
     int tokenStartMarker = _lexer._input.mark();
@@ -71,16 +77,24 @@ public class BatfishLexerRecoveryStrategy {
       _lexer._tokenStartLine = _lexer.getInterpreter().getLine();
       _lexer._text = null;
       _lexer._type = BatfishLexer.UNMATCHABLE_TOKEN;
+      System.out.println("Current _tokenStartCharIndex: " + _lexer._tokenStartCharIndex);
+      System.out.println(
+          "Current _tokenStartCharPositionInLine: " + _lexer._tokenStartCharPositionInLine);
+      System.out.println("Current _tokenStartLine: " + _lexer._tokenStartLine);
       for (int nextChar = _lexer._input.LA(1);
           !_separatorChars.contains(nextChar);
           nextChar = _lexer._input.LA(1)) {
+        System.out.println("nextChar: " + (char) nextChar);
         if (nextChar == IntStream.EOF) {
           _lexer._hitEOF = true;
           _lexer.emitEOF();
           return;
         }
+        System.out.println("Consuming: " + _lexer._input);
         _lexer.getInterpreter().consume(_lexer._input);
       }
+      // int nextNextChar = _lexer._input.LA(2);
+      // System.out.println("The char after next is: " + (char)nextNextChar);
       _lexer.emit();
     } finally {
       // make sure we release marker after match or

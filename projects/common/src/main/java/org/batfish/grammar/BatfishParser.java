@@ -16,12 +16,17 @@ public abstract class BatfishParser extends Parser {
   @Override
   public Token consume() {
     Token o = getCurrentToken();
+    System.out.println(
+        "Consuming: " + o + " inErrorRecoveryMode: " + _errHandler.inErrorRecoveryMode(this));
+    System.out.println("Current state: " + getStateInfo());
+    System.out.println("Current stack: " + this.getRuleInvocationStack(_ctx));
     if (o.getType() != EOF) {
       getInputStream().consume();
       _lastConsumedToken = o.getType();
     }
     boolean hasListener = _parseListeners != null && !_parseListeners.isEmpty();
     if ((_buildParseTrees || hasListener) && !_errHandler.inErrorRecoveryMode(this)) {
+      System.out.println("Creating terminal node: " + o);
       TerminalNode node = _ctx.addChild(createTerminalNode(_ctx, o));
       if (_parseListeners != null) {
         for (ParseTreeListener listener : _parseListeners) {

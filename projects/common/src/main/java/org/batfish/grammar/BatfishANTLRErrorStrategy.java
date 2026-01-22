@@ -158,6 +158,9 @@ public class BatfishANTLRErrorStrategy extends DefaultErrorStrategy {
    */
   private Token recover(Parser parser) {
     lastErrorIndex = parser.getInputStream().index();
+    System.out.println("recover lastErrorIndex " + lastErrorIndex);
+    System.out.println("recover lastErrorStates " + lastErrorStates);
+
     if (lastErrorStates == null) {
       lastErrorStates = new IntervalSet();
     }
@@ -183,6 +186,7 @@ public class BatfishANTLRErrorStrategy extends DefaultErrorStrategy {
       // First base case
       parser.consume();
       Token errorNode = createErrorNode(parser, ctx, separatorToken);
+      System.out.println("BatfishANTLRErrorStrategy#recover - endErrorCondition parent null");
       endErrorCondition(parser);
       return errorNode;
     } else {
@@ -197,6 +201,7 @@ public class BatfishANTLRErrorStrategy extends DefaultErrorStrategy {
       }
       parser.consume();
       Token errorNode = createErrorNode(parser, parent, separatorToken);
+      System.out.println("BatfishANTLRErrorStrategy#recover - endErrorCondition parent not null");
       endErrorCondition(parser);
       return errorNode;
     }
@@ -204,6 +209,7 @@ public class BatfishANTLRErrorStrategy extends DefaultErrorStrategy {
 
   @Override
   public void recover(Parser recognizer, RecognitionException e) {
+    System.out.println("BatfishANTLRErrorStrategy#recover " + e);
     beginErrorCondition(recognizer);
     recover(recognizer);
   }
@@ -217,6 +223,8 @@ public class BatfishANTLRErrorStrategy extends DefaultErrorStrategy {
    * @param recognizer The {@link Parser} for whom adaptive prediction has failed
    */
   public void recoverInCurrentNode(Parser recognizer) {
+    Thread.dumpStack();
+    System.out.println("BatfishANTLRErrorStrategy#recoverInCurrentNode");
     beginErrorCondition(recognizer);
     lastErrorIndex = recognizer.getInputStream().index();
     if (lastErrorStates == null) {
@@ -235,12 +243,26 @@ public class BatfishANTLRErrorStrategy extends DefaultErrorStrategy {
     if (recognizer.getInputStream().LA(1) == Lexer.EOF) {
       recover(recognizer);
     } else {
+      System.out.println("BatfishANTLRErrorStrategy#recoverInCurrentNode - endErrorCondition");
+      System.out.println("Stack: " + recognizer.getRuleInvocationStack());
       endErrorCondition(recognizer);
+      System.out.println("Stack (end): " + recognizer.getRuleInvocationStack());
     }
   }
 
   @Override
   public Token recoverInline(Parser recognizer) throws RecognitionException {
+    System.out.println("BatfishANTLRErrorStrategy#recoverInline");
+    Token currentToken = recognizer.getCurrentToken();
+    String foundText = currentToken.getText();
+    String foundType = recognizer.getVocabulary().getDisplayName(currentToken.getType());
+    IntervalSet expected = recognizer.getExpectedTokens();
+    String expectedStr = expected.toString(recognizer.getVocabulary());
+    List<String> stack = recognizer.getRuleInvocationStack();
+    System.out.println("Expected: " + expectedStr);
+    System.out.println("Found: " + foundText + " (" + foundType + ")");
+    System.out.println("Stack: " + stack);
+    Thread.dumpStack();
     beginErrorCondition(recognizer);
     return recover(recognizer);
   }
@@ -281,6 +303,9 @@ public class BatfishANTLRErrorStrategy extends DefaultErrorStrategy {
     if (!lexerErrorAtStartOfLineAtLoopExitDecision
         && (nextTokens.contains(Token.EPSILON) || nextTokens.contains(la))) {
       return;
+    } else {
+      System.out.println(
+          "BatfishANTLRErrorStrategy#sync - in lexerErrorAtStartOfLineAtLoopExitDecision");
     }
     /*
      * END: Copied from super
@@ -315,6 +340,7 @@ public class BatfishANTLRErrorStrategy extends DefaultErrorStrategy {
            * middle in the middle of a line; in that case we want to throw the whole loop (and its
            * containing context) away.
            */
+          System.out.println("BatfishANTLRErrorStrategy#sync");
           beginErrorCondition(recognizer);
           throw new InputMismatchException(recognizer);
         }

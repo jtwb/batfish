@@ -122786,13 +122786,16 @@
               },
               "tieBreaker" : "ARRIVAL_ORDER"
             },
-            "fibExportPolicy" : "~FIB_EXPORT_POLICY:default~"
+            "fibExportPolicy" : "~FIB_EXPORT_POLICY:default~",
+            "routeDistinguisher" : "192.168.1.2:1"
           },
           "fabric" : {
-            "name" : "fabric"
+            "name" : "fabric",
+            "routeDistinguisher" : "192.168.1.2:2"
           },
           "vr" : {
-            "name" : "vr"
+            "name" : "vr",
+            "routeDistinguisher" : "192.168.1.2:3"
           }
         }
       },
